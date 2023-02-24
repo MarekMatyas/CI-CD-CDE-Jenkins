@@ -130,3 +130,101 @@ The maintenance stage ensures tha the software continues to meet the user's need
 
 
 Overall, the SDLC is a structured and systematic approach to software development that provides a framework for managing the software development process from start to finish.
+
+
+
+# Setting up CI
+
+
+![](Jenkins_dia.png)
+
+We need to establish the connection between our local host and GitHub.
+
+We need to create an RSA key on our local host in GitBash terminal in `.ssh` folder where we store all of our keys. 
+
+- `ssh-keygen -t rsa -b 4096 -C "email_address"` and choose appropriate name for the key folder that will create a private key and public key. 
+
+We will need to copy the public key using `cat name.pub` to display the content of the key and paste it in: **Settings** of the repo that has the app folder, **Deploy keys** and **Add key**. 
+
+
+**Then we need to create a Job on Jenkins.**
+
+Use appropriate name for this job "marek-CI".
+
+In the description we can type "Building CI with webhook, Project URL with HTTPS, Repo URL with SSH".
+
+Next we click on "Discard old builds"- Max: 3
+
+**GitHub project check box:** We provide HTTPS URL from the repo with the app
+
+
+**Office 365 Connector**: "Restrict where this project can be run->**Label Expression**: sparta-ubuntu-node
+
+**Source Code Management**- Git:
+
+- Copy the SSH URL from the same repo and paste it into the "Repository URL"
+
+**Note** if we are getting an error "Failed to connect to repository" this happened because the GitHub and Jenkins do not know if Jenkins request is secure. To resolve this we need to go to GitHub and go to "Settings" of that specific repo and select "Deploy key"-> "Add deploy key", name it and paste in the Public key we created on our local host and "Allow write access".
+
+We will need to enter the private key in t
+**Credentials**- "Add" dropdown 
+
+![](key.png)
+
+**Kind**: SSH Username with private key
+
+We need to name it, use the same name you have for your private key and Click on "Enter Directly"->"Add" and paste the content of your private key into the box. 
+
+Lastly "Add" and Choose the key we just used. 
+
+**Branch specifier**: */main
+
+
+**Build Triggers**: First iteration we will trigger it manually
+
+
+
+
+**Build environment**: Provide Node& npm check box(We provided all the plugins needed)
+
+
+**Build steps**: Execute shell
+
+- `cd app`
+- `npm install`
+- `npm test`
+
+Lastly "Apply" and "Save".
+
+In the project we click on "Build now" and it will build the instance. 
+
+We can find the code that has been cloned into Jenkins we click in "Work space". 
+
+
+If we would like it to trigger an instance with webhook we will need to go to the "Configuration" and in the **Build Trigger** section we click on "GitHub hook trigger from GITScm polling".
+
+We will need to copy the IP:port and we go to GitHub repo settings and click on "Webhooks" and "Add Webhook". 
+
+**Payload URL**: Paste in the IP:port/github-webhook/
+**Content Type**: application/json
+**Which events would you like to trigger this webhook**: Just the push event
+Toggle **Active**
+Lastly "Add webhook".
+**NOTE**:
+ Everytime we turn off the Jenkins and spin it up again the IP will change. 
+
+
+ Now that we added the webhook, every change made locally will be passed down to GitHub and Jenkins. 
+
+
+ Now we will have to go to the Jenkins job and go into "Configuration" and in the **Build Trigger** section we click on "GitHub hook trigger from GITScm polling".
+
+ If we would like to check the functionality we can go back to our GitBash terminal, navigate to the folder where we store our app and use `nano README.md` to make a change in the README file and save it. 
+
+ ```
+ git add .
+ git commit -m "Testing CI"
+ git push -u origin main
+ ```
+
+After that we can check if it has been pushed on our GitHub repository and lastly check if Jenkins has spinned up another instance.
