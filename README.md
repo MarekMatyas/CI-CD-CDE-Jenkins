@@ -247,13 +247,15 @@ Then `Add  Git publisher`:
 
 ### How to set up CD pipeline between Jenkins and AWS EC2 instance
 
-1. We need to change `Build triggers` configuration of our job-> `Build after other project are built`.
+We need to change configuration of our job in Jenkins with the following configuration:
+
+1. `Build triggers` configuration of our job-> `Build after other project are built`.
 
 2. Next we need to change configuration of the `SSH Agent` and input the key that was provided for this task.
 
 3. Now we can move onto the `Execute shell` and input the appropriate commands to run the app and we can Apply and Save the changes.
 
-4. we can now move onto the EC2 instance on AWS:
+4. Now that it is all set up and ready to be built, we can now move onto the EC2 instance on AWS:
 - We will need to use appropriate naming convention
 - OS: Ubuntu 18.04
 - Instance Type: t2.micro
@@ -262,6 +264,10 @@ Then `Add  Git publisher`:
 - Subnet: Default
 - Security group: Create a new
 - Security rules as follows: 
+
+### Note:
+
+We need to remember to allow Jenkins on port 22 and use IP address of Jenkins from the URL bar as well as Jenkins port `8080`. 
 
 ![](SGs.png)
 
