@@ -245,7 +245,7 @@ Then `Add  Git publisher`:
 
 ![](CD.png)
 
-### How to send the main branch into AWS EC2 instance
+### How to set up CD pipeline between Jenkins and AWS EC2 instance
 
 1. We need to change `Build triggers` configuration of our job-> `Build after other project are built`.
 
