@@ -133,7 +133,7 @@ Overall, the SDLC is a structured and systematic approach to software developmen
 
 
 
-# Setting up CI
+# CI(Continuous Integration) set up
 
 
 ![](Jenkins_dia.png)
@@ -196,12 +196,12 @@ Lastly "Add" and Choose the key we just used.
 
 Lastly "Apply" and "Save".
 
-In the project we click on "Build now" and it will build the instance. 
+In the project we click on "Build now" and it will build a job. 
 
 We can find the code that has been cloned into Jenkins we click in "Work space". 
 
 
-If we would like it to trigger an instance with webhook we will need to go to the "Configuration" and in the **Build Trigger** section we click on "GitHub hook trigger from GITScm polling".
+If we would like it to trigger a job with webhook we will need to go to the "Configuration" and in the **Build Trigger** section we click on "GitHub hook trigger from GITScm polling".
 
 We will need to copy the IP:port and we go to GitHub repo settings and click on "Webhooks" and "Add Webhook". 
 
@@ -227,4 +227,42 @@ Lastly "Add webhook".
  git push -u origin main
  ```
 
-After that we can check if it has been pushed on our GitHub repository and lastly check if Jenkins has spinned up another instance.
+After that we can check if it has been pushed on our GitHub repository and lastly check if Jenkins has spinned up another job.
+
+
+## CD(Continuous Delivery) set up
+
+
+Create a `dev` branch localy using `git checkout dev`
+
+If we push changes throught this branch and it will not display on our repo this means that we need to create a branch globally as well. 
+
+If we would like to merge dev branch with main, we will need to start another job on Jenkins and change the "Post build actions" and select the previous job-> `marek-CI` and select `Trigger if build is stable`.
+
+Then `Add  Git publisher`:
+- `Push only if build succeeds`
+- `Merge result`
+
+![](CD.png)
+
+### How to send the main branch into AWS EC2 instance
+
+1. We need to change `Build triggers` configuration of our job-> `Build after other project are built`.
+
+2. Next we need to change configuration of the `SSH Agent` and input the key that was provided for this task.
+
+3. Now we can move onto the `Execute shell` and input the appropriate commands to run the app and we can Apply and Save the changes.
+
+4. we can now move onto the EC2 instance on AWS:
+- We will need to use appropriate naming convention
+- OS: Ubuntu 18.04
+- Instance Type: t2.micro
+- Key pair: devops-tech201
+- VPC: default
+- Subnet: Default
+- Security group: Create a new
+- Security rules as follows: 
+
+![](SGs.png)
+
+Lastly we create an instance. 
