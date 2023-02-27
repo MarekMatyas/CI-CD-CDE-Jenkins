@@ -287,6 +287,10 @@ Next we will need to create a new item on Jenkins called "marek-job3" just like 
 ![](SSH.png)
 3. Now we can move onto the `Execute shell` and input the appropriate commands to run the app and we can Apply and Save the changes.
 
+**Note**:
+
+The Execute shell window may vary case to case but the best practice is to use the `scp` command and `nohup` where scp is for copying files and nohup is to run the app on the background. 
+
 ```
 rsync -avz -e "ssh -o StrictHostKeyChecking=no" app ubuntu@IP:/home/ubuntu
 ssh -o "StrictHostKeyChecking=no" ubuntu@IP <<EOF
