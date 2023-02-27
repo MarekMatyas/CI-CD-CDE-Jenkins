@@ -230,14 +230,19 @@ Lastly "Add webhook".
 After that we can check if it has been pushed on our GitHub repository and lastly check if Jenkins has spinned up another job.
 
 
-## CD(Continuous Delivery) set up
+## CD(Continuous Delivery) pipeline between Jenkins and AWS EC2 instance
 
+![](CI_CD%2Cd.png)
+
+### Job 1
 
 Create a `dev` branch localy using `git checkout dev`
 
-If we push changes throught this branch and it will not display on our repo this means that we need to create a branch globally as well. 
+If we push changes throught this branch and it will not display in the other branch, this means they are not merged yet. 
 
-If we would like to merge dev branch with main, we will need to start another job on Jenkins and change the "Post build actions" and select the previous job-> `marek-CI` and select `Trigger if build is stable`.
+### Job 2
+
+- If we would like to merge dev branch with main, we will need to start another job on Jenkins and change the "Post build actions" and select the previous job-> `marek-CI` and select `Trigger if build is stable`.
 
 Then `Add  Git publisher`:
 - `Push only if build succeeds`
@@ -245,17 +250,13 @@ Then `Add  Git publisher`:
 
 ![](CD.png)
 
-### How to set up CD pipeline between Jenkins and AWS EC2 instance
+Now if we "Apply" and "Save" and the tests are succesful, we should be able to see the changes made in `dev` branch displayed in the `main` branch. 
 
-We need to change configuration of our job in Jenkins with the following configuration:
+### Job 3
 
-1. `Build triggers` configuration of our job-> `Build after other project are built`.
+**Next we need to create an EC2 instance on AWS** 
 
-2. Next we need to change configuration of the `SSH Agent` and input the key that was provided for this task.
-
-3. Now we can move onto the `Execute shell` and input the appropriate commands to run the app and we can Apply and Save the changes.
-
-4. Now that it is all set up and ready to be built, we can now move onto the EC2 instance on AWS:
+We can now move onto the EC2 instance on AWS:
 - We will need to use appropriate naming convention
 - OS: Ubuntu 18.04
 - Instance Type: t2.micro
@@ -267,8 +268,70 @@ We need to change configuration of our job in Jenkins with the following configu
 
 ### Note:
 
-We need to remember to allow Jenkins on port 22 and use IP address of Jenkins from the URL bar as well as Jenkins port `8080`. 
+1. We need to remember to allow Jenkins on port 22 and use IP address of Jenkins from the URL bar as well as Jenkins port `8080`. 
+2. As well as SSH protocol with the IP address of the EC2 instance
 
 ![](SGs.png)
 
 Lastly we create an instance. 
+
+Next we will need to create a new item on Jenkins called "marek-job3" just like before only with there differences:
+
+1. `Build triggers` configuration of our job-> `Build after other project are built` and choose the previous project to be watched.
+2. **Build environment**:
+
+![](B%2Cenv.png)
+
+3. Next we need to change configuration of the `SSH Agent` and input the key that was provided for this task.
+
+![](SSH.png)
+3. Now we can move onto the `Execute shell` and input the appropriate commands to run the app and we can Apply and Save the changes.
+
+```
+rsync -avz -e "ssh -o StrictHostKeyChecking=no" app ubuntu@IP:/home/ubuntu
+ssh -o "StrictHostKeyChecking=no" ubuntu@IP <<EOF
+	sudo bash ./app/provsion.sh
+    cd app
+    pm2 kill
+    pm2 start app.js
+EOF
+```
+
+```
+rsync -avz -e "ssh -o StrictHostKeyChecking=no" app ubuntu@3.252.163.41:/home/ubuntu
+ssh -o "StrictHostKeyChecking=no" ubuntu@3.252.163.41 <<EOF
+    sudo bash ./app/provsion.sh
+    cd app
+    npm install
+    nohup npm start 2>/dev/null 1>/dev/null&
+    
+EOF
+```
+
+```
+
+scp -v -r -o StrictHostKeyChecking=no app/ ubuntu@3.252.163.41:/home/ubuntu/
+ssh -A -o StrictHostKeyChecking=no ubuntu@3.252.163.41 <<EOF
+
+cd app
+npm install
+pm2 kill
+pm2 start app.js
+
+```
+
+Lastly "Apply", "Save", and "Build Now". 
+
+When the job has been successful we can open GitBash terminal, navigate into the `.ssh` folder where we keep all the keys and connect to the EC2 instance using SSH.
+
+Next we run `npm install` that will download package and it's dependencies and `node app.js` to run the app. 
+
+
+If we would like to see if the pipeline is functional, we can make a change locally in `app`->`views`->`nano index.ejs` and change the second heading.
+As we can see in the picture below, I have changed the heading to "The app is running correctly using CI/CD."
+
+![](app.png)
+
+
+
+
