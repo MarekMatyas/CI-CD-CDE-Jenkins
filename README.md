@@ -1,4 +1,4 @@
-# CI-CD-CDE-Jenkins
+# CI-CD-CDE with Jenkins
 
 ## CI (Continuous Integration)
 
@@ -25,6 +25,8 @@ A continuous delivery pipeline could have a manual gate right before production.
 
 The engineering team keeps a shippable version of the product ready after every sprint, and the business team makes the finall call to release the product to all customers, or a cross-section of the population, or perhaps to people who line in a certain geographical location. 
 
+![](pictures/CICD%2C1.png)
+
 
 ## CDE (Continuous deployment)
 
@@ -37,7 +39,7 @@ Continuous deployment is an excellent way to accelerate the feedback loop with y
 
 Developers can focus on building software, and they see their work go live minutes after they have finished working on it. 
 
-![](CICD.png)
+
 
 
 ---
@@ -47,7 +49,7 @@ Developers can focus on building software, and they see their work go live minut
 
 Jenkins is an open-source automation server used to build, test, and deploy software projects. Essentially enables CI and CD pipelines, allowing software developers to automate their build, test and deployment processes. 
 
-![](jenkins.png)
+![](pictures/jenkins.png)
 
 
 ### How does it work ?
@@ -89,7 +91,7 @@ This cycle will continue until all tests are marked as passed.
 
 ## Git workflow
 
-![](git_w.jfif)
+![](pictures/git_w.jfif)
 
 In the diagram above we have the Git workflow. As we can see we have different stages. 
 
@@ -104,7 +106,7 @@ In the diagram above we have the Git workflow. As we can see we have different s
 
 ## SDLC (Software Developemnt Life Cycle)
 
-![](SDLC-stages.png)
+![](pictures/SDLC-stages.png)
 
 
 
@@ -136,7 +138,7 @@ Overall, the SDLC is a structured and systematic approach to software developmen
 # CI(Continuous Integration) set up
 
 
-![](Jenkins_dia.png)
+![](pictures/Jenkins_dia.png)
 
 We need to establish the connection between our local host and GitHub.
 
@@ -169,7 +171,7 @@ Next we click on "Discard old builds"- Max: 3
 We will need to enter the private key in t
 **Credentials**- "Add" dropdown 
 
-![](key.png)
+![](pictures/key.png)
 
 **Kind**: SSH Username with private key
 
@@ -232,7 +234,7 @@ After that we can check if it has been pushed on our GitHub repository and lastl
 
 ## CD(Continuous Delivery) pipeline between Jenkins and AWS EC2 instance
 
-![](CI_CD%2Cd.png)
+![](pictures/CI_CD%2Cd.png)
 
 ### Job 1
 
@@ -248,7 +250,7 @@ Then `Add  Git publisher`:
 - `Push only if build succeeds`
 - `Merge result`
 
-![](CD.png)
+![](pictures/CD.png)
 
 Now if we "Apply" and "Save" and the tests are succesful, we should be able to see the changes made in `dev` branch displayed in the `main` branch. 
 
@@ -271,7 +273,7 @@ We can now move onto the EC2 instance on AWS:
 1. We need to remember to allow Jenkins on port 22 and use IP address of Jenkins from the URL bar as well as Jenkins port `8080`. 
 2. As well as SSH protocol with the IP address of the EC2 instance
 
-![](SGs.png)
+![](pictures/SGs.png)
 
 Lastly we create an instance. 
 
@@ -280,11 +282,11 @@ Next we will need to create a new item on Jenkins called "marek-job3" just like 
 1. `Build triggers` configuration of our job-> `Build after other project are built` and choose the previous project to be watched.
 2. **Build environment**:
 
-![](B%2Cenv.png)
+![](pictures/B%2Cenv.png)
 
 3. Next we need to change configuration of the `SSH Agent` and input the key that was provided for this task.
 
-![](SSH.png)
+![](pictures/SSH.png)
 3. Now we can move onto the `Execute shell` and input the appropriate commands to run the app and we can Apply and Save the changes.
 
 **Note**:
@@ -334,7 +336,7 @@ Next we run `npm install` that will download package and it's dependencies and `
 If we would like to see if the pipeline is functional, we can make a change locally in `app`->`views`->`nano index.ejs` and change the second heading.
 As we can see in the picture below, I have changed the heading to "The app is running correctly using CI/CD."
 
-![](app.png)
+![](pictures/app.png)
 
 
 
